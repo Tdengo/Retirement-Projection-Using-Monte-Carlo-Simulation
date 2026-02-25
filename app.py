@@ -172,7 +172,7 @@ if st.button("Run Simulation", type="primary"):
         with col_chart1:
             st.markdown("#### The Journey (Spaghetti Plot)")
             fig_spag, ax_spag = plt.subplots(figsize=(8, 5))
-            for i in range(min(10, num_simulations)):
+            for i in range(min(2000, num_simulations)):
                 ax_spag.plot(all_paths[i], color='teal', alpha=0.1)
 
             all_paths_arr = np.array(all_paths)
@@ -214,6 +214,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
