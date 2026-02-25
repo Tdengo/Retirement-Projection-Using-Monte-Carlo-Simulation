@@ -7,7 +7,7 @@ import scipy.stats as stats
 st.set_page_config(page_title="Monte Carlo Simulator", layout="wide")
 st.title("Monte Carlo Retirement Simulator")
 st.markdown("""**Description:**  
-Traditional retirement calculators rely on static, normally distributed returns, which dangerously underestimate the impact of \"Black Swan\" market crashes and sequence-of-returns risk. This project utilizes a Monte Carlo decumulation engine to stress-test retirement portfolios against extreme macroeconomic conditions. Built entirely in Python and deployed via Streamlit, it allows users to accurately project portfolio survival probabilities using advanced statistical frameworks, including fat-tailed distributions and dynamic behavioral guardrails. This project involves the use of stochastic lifespans and copulas between market returns and inflation rates, which provides a step up on free prediction models.""")
+Traditional retirement calculators rely on static, normally distributed returns, which dangerously underestimate the impact of \"Black Swan\" market crashes and sequence-of-returns risk. This project utilizes a Monte Carlo decumulation engine to stress-test retirement portfolios against extreme macroeconomic conditions. Built in Python and deployed via Streamlit, it allows users to accurately project portfolio survival probabilities using robust statistical frameworks, including fat-tailed distributions and dynamic behavioral guardrails. This project involves the use of stochastic lifespans and copulas between market returns and inflation rates, which provides a step up on free prediction models.""")
 st.divider()
 st.markdown("""**How To Use:**  
 Input your specific personal, market, and macroeconomic assumptions including dynamic income streams, behavioral guardrails, and effective tax rates. Click the \"Run Simulation\" button to run thousands of simulated lifecycles. Review your portfolio's performance metrics to gauge success rate, median real-dollar balance, and worst-case scenario outcomes.""")
@@ -170,7 +170,7 @@ if st.button("Run Simulation", type="primary"):
         col_chart1, col_chart2 = st.columns(2)
 
         with col_chart1:
-            st.markdown("#### The Journey (Spaghetti Plot)")
+            st.markdown("#### Spaghetti Plot")
             fig_spag, ax_spag = plt.subplots(figsize=(8, 5))
             for i in range(min(150, num_simulations)):
                 ax_spag.plot(all_paths[i], color='teal', alpha=0.15)
@@ -186,7 +186,7 @@ if st.button("Run Simulation", type="primary"):
             st.pyplot(fig_spag)
 
         with col_chart2:
-            st.markdown("#### Final Outcomes (Probability Distribution)")
+            st.markdown("#### Probability Distribution of Final Outcomes")
             fig_hist, ax_hist = plt.subplots(figsize=(8, 5))
             
             p10 = np.percentile(ending_balances, 10)
@@ -214,6 +214,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
