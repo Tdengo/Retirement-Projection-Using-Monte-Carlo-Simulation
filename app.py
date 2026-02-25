@@ -74,7 +74,7 @@ if st.button("Run Simulation", type="primary"):
         calibration_shock = np.random.standard_t(degrees_of_freedom, size=calibration_simulation_count)
         scaled_calibration_grid = calibration_shock[:, None] * scaling_factor_path
         expectation_denominator_path = np.mean(np.exp(scaled_calibration_grid), axis=0)
-        log_mean = np.log((1 + mean_path) / expectation_denominator_path)
+        log_mean_path = np.log((1 + mean_path) / expectation_denominator_path)
         np.random.seed(None)
 
         # 3. Vectorization
@@ -224,4 +224,5 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
