@@ -3,16 +3,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 
-# --- STREAMLIT UI SETUP ---
+# Streamlit UI
 st.set_page_config(page_title="Advanced Monte Carlo Simulator", layout="wide")
 st.title("Monte Carlo Retirement Simulator")
 st.markdown("Fully Vectorized Log-t Engine with Gaussian Copulas & Dynamic Guardrails.")
 
-# --- SIDEBAR (USER INPUTS) ---
+# User Inputs (Sidebar)
 st.sidebar.header("Personal Assumptions")
 starting_balance = st.sidebar.number_input("Starting Balance ($)", value=1000000, step=50000)
 initial_withdrawal = st.sidebar.number_input("Initial Withdrawal ($)", value=40000, step=5000)
 years_in_retirement = st.sidebar.slider("Years in Retirement", min_value=10, max_value=50, value=30)
+
+st.sidebar.header("Additional Income Streams")
+num_income_streams = st.sidebar.selectbox("Number of Income Streams", [0, 1, 2, 3, 4], index=1)
+income_streams = []
+
+for j in range(num_income_streams):
+    with st.sidebar.expander(f"Income Stream {j+1}", expanded=(j==0)):
+        income_amount = st.number_input(f"Annual Income ($ Real)", value=20000, step=5000, key=f"amt_{j}")
+        income_start = st.slider(f"Starts in Year", 0, years_in_retirement, 5, key=f"start_{j}")
+        income_end = st.slider(f"Ends in Year", income_start, years_in_retirement, years_in_retirement, key=f"end_{j}")
+
+        income_streams.append({"amount": income_amount, "start": income_start, "end": income_end})
 
 st.sidebar.header("Behavioral Guardrails")
 minimum_withdrawal = st.sidebar.number_input("Absolute Floor ($ Real)", value=20000, step=2000)
@@ -31,7 +43,7 @@ corr = st.sidebar.slider("Stock/Inflation Correlation", -1.0, 1.0, -0.3, 0.1)
 
 num_simulations = st.sidebar.selectbox("Number of Simulations", [10000, 25000, 50000], index=1)
 
-# --- SIMULATION BUTTON ---
+# Simulation Button
 if st.button("Run Simulation", type="primary"):
     
     with st.spinner(f'Vectorizing and running {num_simulations} lifetimes...'):
@@ -49,7 +61,7 @@ if st.button("Run Simulation", type="primary"):
         log_mean = np.log((1 + target_arithmetic_mean) / expectation_denominator)
         np.random.seed(None)
 
-        # 3. Vectorization (1.5 million random variables generated instantly)
+        # 3. Vectorization
         total_steps = num_simulations * years_in_retirement
         z_all = np.random.multivariate_normal([0, 0], cov_matrix, size=total_steps)
 
@@ -60,7 +72,7 @@ if st.button("Run Simulation", type="primary"):
         shocks_grid = shocks_all.reshape(num_simulations, years_in_retirement)
         z_inflation_grid = z_inflation_all.reshape(num_simulations, years_in_retirement)
 
-        # --- VALIDATION BLOCK (Your custom testing logic) ---
+        # Validation
         flat_shocks = shocks_grid.flatten()
         scaled_flat = flat_shocks * scaling_factor
         copula_returns = np.exp(log_mean + scaled_flat) - 1
@@ -77,8 +89,20 @@ if st.button("Run Simulation", type="primary"):
             path = [starting_balance]
 
             for year in range(years_in_retirement):
-                # Take out living expenses
-                current_balance -= current_withdrawal
+                # Aggregate Income
+                total_income_this_year = 0
+                for stream in income_streams:
+                    if stream["start"] <= year < stream["end"]:
+                        total_income_this_year += stream["amount"]
+
+                # Portfolio Withdrawal
+                actual_portfolio_withdrawal = current_withdrawal - total_income_this_year
+                
+                if actual_portfolio_withdrawal < 0:
+                    actual_portfolio_withdrawal = 0
+
+                # Remove adjusted amount from the market
+                current_balance -= actual_portfolio_withdrawal
 
                 # Bankruptcy Check
                 if current_balance <= 0:
@@ -100,7 +124,7 @@ if st.button("Run Simulation", type="primary"):
                 current_balance *= real_growth_multiplier
 
                 # Parameterized Dynamic Guardrails
-                if (current_withdrawal / current_balance) > max_withdrawal:
+                if (actual_portfolio_withdrawal / current_balance) > max_withdrawal:
                     current_withdrawal *= (1 - max_withdrawal_paycut)
                     if current_withdrawal < minimum_withdrawal:
                         current_withdrawal = minimum_withdrawal
@@ -113,17 +137,17 @@ if st.button("Run Simulation", type="primary"):
             if current_balance > 0:
                 successful_lifetimes += 1
 
-        # --- CALCULATE METRICS ---
+        # Calculation Metrics
         success_rate = (successful_lifetimes / num_simulations) * 100
         median_ending_balance = np.median(ending_balances)
         worst_case = np.min(ending_balances)
         best_case = np.max(ending_balances)
 
-        # --- DISPLAY RESULTS IN DASHBOARD ---
+        # Display
         st.divider()
         st.success("Simulation Complete! All figures displayed in **Today's Purchasing Power (Real Dollars)**.")
         
-        # Prove the math works to the user
+        # Proof and Metrics
         st.info(f"**Validation Check:** Target Arithmetic Mean was {target_arithmetic_mean*100:.2f}%. Your simulated Copula Arithmetic Mean was **{actual_arithmetic_mean*100:.2f}%**.")
 
         col1, col2, col3, col4 = st.columns(4)
@@ -132,7 +156,7 @@ if st.button("Run Simulation", type="primary"):
         col3.metric("Worst Case", f"${worst_case:,.0f}")
         col4.metric("Best Case", f"${best_case:,.0f}")
 
-        # --- GRAPHS ---
+        # Graphs
         st.divider()
         col_chart1, col_chart2 = st.columns(2)
 
@@ -161,4 +185,5 @@ if st.button("Run Simulation", type="primary"):
             ax_hist.set_xlabel('Final Portfolio Balance ($ Real)')
             ax_hist.set_ylabel('Number of Occurrences')
             ax_hist.legend()
+
             st.pyplot(fig_hist)
