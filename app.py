@@ -15,7 +15,7 @@ initial_withdrawal = st.sidebar.number_input("Annual Withdrawal ($)", value=4000
 years_in_retirement = st.sidebar.slider("Years in Retirement", min_value=10, max_value=50, value=30)
 
 st.sidebar.header("Additional Income Streams")
-num_income_streams = st.sidebar.selectbox("Number of Income Streams", [0, 1, 2, 3, 4], index=1)
+num_income_streams = st.sidebar.selectbox("Number of Income Streams", [0, 1, 2, 3, 4], index=0)
 income_streams = []
 
 for j in range(num_income_streams):
@@ -205,6 +205,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
