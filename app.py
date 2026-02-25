@@ -27,17 +27,17 @@ for j in range(num_income_streams):
         income_streams.append({"amount": income_amount, "start": income_start, "end": income_end})
 
 st.sidebar.header("Behavioral Guardrails")
-minimum_withdrawal = st.sidebar.number_input("Absolute Floor ($ Real)", value=20000, step=2000)
-max_withdrawal = st.sidebar.slider("Guardrail Trigger Threshold (%)", 1.0, 15.0, 6.0, 0.5) / 100
-max_withdrawal_paycut = st.sidebar.slider("Paycut Severity (%)", 1.0, 25.0, 10.0, 1.0) / 100
+minimum_withdrawal = st.sidebar.number_input("Minimum Living Standard ($ Real)", value=20000, step=2000)
+max_withdrawal = st.sidebar.slider("Guardrail Trigger Threshold (%) n\(Guyton-Klinger rule ~5.5%)", 1.0, 15.0, 6.0, 0.5) / 100
+max_withdrawal_paycut = st.sidebar.slider("Paycut Severity (%) n\(Academic Standard ~10%)", 1.0, 25.0, 10.0, 1.0) / 100
 
 st.sidebar.header("Market Assumptions")
-target_arithmetic_mean = st.sidebar.slider("Target Arithmetic Mean (%)", 1.0, 15.0, 7.0, 0.5) / 100
+target_arithmetic_mean = st.sidebar.slider("Target Arithmetic Mean (%) n\(Historical nominal return ~8%)", 1.0, 15.0, 7.0, 0.5) / 100
 volatility = st.sidebar.slider("Volatility (%)", 5.0, 30.0, 15.0, 1.0) / 100
-degrees_of_freedom = st.sidebar.slider("Fat Tails (Degrees of Freedom)", 3, 20, 5)
+degrees_of_freedom = st.sidebar.slider("Fat Tails (Degrees of Freedom) n\(US Market generally exhibits 4, 5)", 3, 20, 5)
 
 st.sidebar.header("Inflation & Macro")
-average_inflation = st.sidebar.slider("Average Inflation (%)", 0.0, 10.0, 3.0, 0.5) / 100
+average_inflation = st.sidebar.slider("Average Inflation (%) n\(Long-term historical average ~3%)", 0.0, 10.0, 3.0, 0.5) / 100
 inflation_volatility = st.sidebar.slider("Inflation Volatility (%)", 0.0, 5.0, 1.0, 0.1) / 100
 corr = st.sidebar.slider("Stock/Inflation Correlation", -1.0, 1.0, -0.3, 0.1)
 
@@ -187,4 +187,5 @@ if st.button("Run Simulation", type="primary"):
             ax_hist.legend()
 
             st.pyplot(fig_hist)
+
 
