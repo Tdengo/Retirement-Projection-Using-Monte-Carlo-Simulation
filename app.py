@@ -38,9 +38,16 @@ minimum_withdrawal = st.sidebar.number_input("Minimum Living Standard ($ Real)",
 max_withdrawal = st.sidebar.slider("Guardrail Trigger Threshold (%)", 1.0, 15.0, 6.0, 0.5, help="Guyton-Klinger rule is typically ~5.5%") / 100
 max_withdrawal_paycut = st.sidebar.slider("Paycut Severity (%)", 1.0, 25.0, 10.0, 1.0, help="The academic standard is a 10% paycut.") / 100
 
-st.sidebar.header("Market Assumptions")
-target_arithmetic_mean = st.sidebar.slider("Target Arithmetic Mean (%)", 1.0, 15.0, 7.0, 0.5, help="Historical nominal return is ~8% to 10%") / 100
-volatility = st.sidebar.slider("Volatility (%)", 5.0, 30.0, 15.0, 1.0) / 100
+st.sidebar.header("Market Assumptions and Glide Path")
+st.caption("Shift your protfolio allocation over time. Set Start and End to the same number for a static portfolio.")
+col_start, col_end = st.sidebar.columns(2)
+with col_start:
+    start_mean = st.number_input("Start Mean (%)", value=8.0, step=0.5) / 100
+    start_volatility = st.number_input("Start Volatility (%)", value=15.0, step=1.0) / 100
+with col_end:
+    end_mean = st.number_input("End Mean(%)", value = 5.0, step=0.5) / 100
+    end_volatility = st.number_input("End Volatility (%)", value=8.0, step=1.0) / 100
+
 degrees_of_freedom = st.sidebar.slider("Fat Tails (Degrees of Freedom)", 3, 20, 5, help="The US Market generally exhibits 4 or 5 degrees of freedom.")
 
 st.sidebar.header("Inflation & Macro")
@@ -57,15 +64,18 @@ if st.button("Run Simulation", type="primary"):
         
         # 1. Copula & Market Setup
         cov_matrix = [[1.0, corr], [corr, 1.0]]
-        scaling_factor = volatility * np.sqrt((degrees_of_freedom - 2) / degrees_of_freedom)
-
+        
+        mean_path = np.linspace(start_mean, end_mean, years_in_retirement)
+        vol_path = np.linspace(start_volatility, end_volatility, years_in_retirement)
+        scaling_factor_path = vol_path * np.sqrt((degrees_of_freedom - 2) / degrees_of_freedom)
+        
         # 2. Calibration
         np.random.seed(500)
         calibration_simulation_count = 500000
         calibration_shock = np.random.standard_t(degrees_of_freedom, size=calibration_simulation_count)
-        scaled_calibration_shock = calibration_shock * scaling_factor
-        expectation_denominator = np.mean(np.exp(scaled_calibration_shock))
-        log_mean = np.log((1 + target_arithmetic_mean) / expectation_denominator)
+        scaled_calibration_grid = calibration_shock[:, None] * scaling_factor_path
+        expectation_denominator_path = np.mean(np.exp(scaled_calibration_grid), axis=0)
+        log_mean = np.log((1 + mean_path) / expectation_denominator_path)
         np.random.seed(None)
 
         # 3. Vectorization
@@ -80,10 +90,9 @@ if st.button("Run Simulation", type="primary"):
         z_inflation_grid = z_inflation_all.reshape(num_simulations, years_in_retirement)
 
         # Validation
-        flat_shocks = shocks_grid.flatten()
-        scaled_flat = flat_shocks * scaling_factor
-        copula_returns = np.exp(log_mean + scaled_flat) - 1
+        copula_returns = np.exp(log_mean_path + (shocks_grid * scaling_factor_path)) - 1
         actual_arithmetic_mean = np.mean(copula_returns)
+        target_average_mean = np.mean(mean_path)
 
         # 4. The Monte Carlo Loop
         successful_lifetimes = 0
@@ -124,7 +133,10 @@ if st.button("Run Simulation", type="primary"):
                 shock = shocks_grid[i, year]
                 z_inflation = z_inflation_grid[i, year]
 
-                this_year_nominal_return = log_mean + (shock * scaling_factor)
+                this_year_scaling_factor = scaling_factor_path[year]
+                this_year_log_mean = log_mean_path[year]
+                
+                this_year_nominal_return = this_year_log_mean + (shock * this_year_scaling_factor)
                 nominal_growth_multiplier = np.exp(this_year_nominal_return)
                 inflation_rate = average_inflation + (z_inflation * inflation_volatility)
 
@@ -157,8 +169,7 @@ if st.button("Run Simulation", type="primary"):
         st.success("Simulation Complete! All figures displayed in **Today's Purchasing Power (Real Dollars)**.")
         
         # Proof and Metrics
-        st.info(f"**Validation Check:** Target Arithmetic Mean was {target_arithmetic_mean*100:.2f}%. Your simulated Copula Arithmetic Mean was **{actual_arithmetic_mean*100:.2f}%**.")
-
+        st.info(f"**Validation Check:** Target Average Mean across Glide Path was {target_average_mean*100:.2f}%. Your simulated Copula Arithmetic Mean was **{actual_arithmetic_mean*100:.2f}%**.")
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Success Rate", f"{success_rate:.1f}%")
         col2.metric("Median Balance", f"${median_ending_balance:,.0f}")
@@ -214,21 +225,3 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
