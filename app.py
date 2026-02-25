@@ -38,8 +38,7 @@ minimum_withdrawal = st.sidebar.number_input("Minimum Living Standard ($ Real)",
 max_withdrawal = st.sidebar.slider("Guardrail Trigger Threshold (%)", 1.0, 15.0, 6.0, 0.5, help="Guyton-Klinger rule is typically ~5.5%") / 100
 max_withdrawal_paycut = st.sidebar.slider("Paycut Severity (%)", 1.0, 25.0, 10.0, 1.0, help="The academic standard is a 10% paycut.") / 100
 
-st.sidebar.header("Market Assumptions and Glide Path")
-st.caption("Shift your protfolio allocation over time. Set Start and End to the same number for a static portfolio.")
+st.sidebar.header("Market Assumptions and Glide Path", help="Shift your portfolio allocation over time. Set Start and End to the same number for a static portfolio.")
 col_start, col_end = st.sidebar.columns(2)
 with col_start:
     start_mean = st.number_input("Start Mean (%)", value=8.0, step=0.5) / 100
@@ -225,3 +224,4 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
