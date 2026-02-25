@@ -26,6 +26,9 @@ for j in range(num_income_streams):
 
         income_streams.append({"amount": income_amount, "start": income_start, "end": income_end})
 
+st.sidebar.header("Taxes")
+effective_tax_rate = st.sidebar.slider("Effective Tax Rate (%)", 0.0, 50.0, 15.0, 1.0, help="The blended average percentage you pay in taxes (not your top marginal bracket).") / 100
+
 st.sidebar.header("Behavioral Guardrails")
 minimum_withdrawal = st.sidebar.number_input("Minimum Living Standard ($ Real)", value=20000, step=2000)
 max_withdrawal = st.sidebar.slider("Guardrail Trigger Threshold (%)", 1.0, 15.0, 6.0, 0.5, help="Guyton-Klinger rule is typically ~5.5%") / 100
@@ -101,8 +104,10 @@ if st.button("Run Simulation", type="primary"):
                 if actual_portfolio_withdrawal < 0:
                     actual_portfolio_withdrawal = 0
 
+                gross_portfolio_withdrawal = actual_portfolio_withdrawal / (1 - effective_tax_rate)
+                
                 # Remove adjusted amount from the market
-                current_balance -= actual_portfolio_withdrawal
+                current_balance -= gross_portfolio_withdrawal
 
                 # Bankruptcy Check
                 if current_balance <= 0:
@@ -124,7 +129,7 @@ if st.button("Run Simulation", type="primary"):
                 current_balance *= real_growth_multiplier
 
                 # Parameterized Dynamic Guardrails
-                if (actual_portfolio_withdrawal / current_balance) > max_withdrawal:
+                if (gross_portfolio_withdrawal / current_balance) > max_withdrawal:
                     current_withdrawal *= (1 - max_withdrawal_paycut)
                     if current_withdrawal < minimum_withdrawal:
                         current_withdrawal = minimum_withdrawal
@@ -205,6 +210,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
