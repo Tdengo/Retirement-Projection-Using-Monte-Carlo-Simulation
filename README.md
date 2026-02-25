@@ -1,3 +1,5 @@
+https://retirement-projection-using-monte-carlo-simulation-tgmbdx2xnin.streamlit.app/
+
 **Summary:** Traditional retirement calculators rely on static, normally distributed returns, which dangerously underestimate the impact of "Black Swan" market crashes and sequence-of-returns risk. This project utilizes a Monte Carlo decumulation engine to stress-test retirement portfolios against extreme macroeconomic conditions. Built entirely in Python and deployed via Streamlit, it allows users to accurately project portfolio survival probabilities using advanced statistical frameworks, including fat-tailed distributions and dynamic behavioral guardrails. This project involves the use of stochastic lifespans and copulas between market returns and inflation rates, which provides a step up on free prediction models. 
 
 **Key Features**
