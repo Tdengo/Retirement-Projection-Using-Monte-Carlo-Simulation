@@ -173,7 +173,7 @@ if st.button("Run Simulation", type="primary"):
             st.markdown("#### The Journey (Spaghetti Plot)")
             fig_spag, ax_spag = plt.subplots(figsize=(8, 5))
             for i in range(min(150, num_simulations)):
-                ax_spag.plot(all_paths[i], color='teal', alpha=0.5)
+                ax_spag.plot(all_paths[i], color='teal', alpha=0.2)
 
             all_paths_arr = np.array(all_paths)
             ax_spag.plot(np.percentile(all_paths_arr, 50, axis=0), color='black', linewidth=2, label='Median')
@@ -214,6 +214,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
