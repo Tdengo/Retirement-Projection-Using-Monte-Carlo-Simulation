@@ -177,16 +177,35 @@ if st.button("Run Simulation", type="primary"):
             st.pyplot(fig_spag)
 
         with col_chart2:
-            st.markdown("#### Final Outcomes (Distribution)")
+            st.markdown("#### Final Outcomes (Probability Distribution)")
             fig_hist, ax_hist = plt.subplots(figsize=(8, 5))
-            ax_hist.hist(ending_balances, bins=50, color='cadetblue', edgecolor='black')
-            ax_hist.axvline(median_ending_balance, color='mistyrose', linestyle='dashed', linewidth=2, label=f'Median: ${median_ending_balance:,.0f}')
+            
+            p10 = np.percentile(ending_balances, 10)
+            p50 = np.percentile(ending_balances, 50)
+            p90 = np.percentile(ending_balances, 90)
+            p95 = np.percentile(ending_balances, 95) # Used to cut off the extreme right tail
+            
+            weights = np.ones_like(ending_balances) / len(ending_balances)
+            
+            bins = np.linspace(0, p95, 40)
+            n, bins, patches = ax_hist.hist(ending_balances, bins=bins, weights=weights, color='cadetblue', edgecolor='white')
+            
+            if len(patches) > 0:
+                patches[0].set_facecolor('salmon')
+
+            ax_hist.axvline(p10, color='red', linestyle='dashed', linewidth=2, label=f'10th %tile: ${p10:,.0f}')
+            ax_hist.axvline(p50, color='black', linestyle='dashed', linewidth=2, label=f'Median: ${p50:,.0f}')
+            ax_hist.axvline(p90, color='green', linestyle='dashed', linewidth=2, label=f'90th %tile: ${p90:,.0f}')
             
             ax_hist.set_xlabel('Final Portfolio Balance ($ Real)')
-            ax_hist.set_ylabel('Number of Occurrences')
+            ax_hist.set_ylabel('Probability')
+            ax_hist.set_xlim(left=0, right=p95)
+            
+            ax_hist.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: '{:.0%}'.format(y)))
+            
             ax_hist.legend()
-
             st.pyplot(fig_hist)
+
 
 
 
