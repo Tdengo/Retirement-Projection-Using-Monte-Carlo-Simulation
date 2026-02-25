@@ -6,10 +6,10 @@ import scipy.stats as stats
 # Streamlit UI
 st.set_page_config(page_title="Monte Carlo Simulator", layout="wide")
 st.title("Monte Carlo Retirement Simulator")
-st.markdown("""**Description:** 
+st.markdown("""**Description:**  
 Traditional retirement calculators rely on static, normally distributed returns, which dangerously underestimate the impact of \"Black Swan\" market crashes and sequence-of-returns risk. This project utilizes a Monte Carlo decumulation engine to stress-test retirement portfolios against extreme macroeconomic conditions. Built entirely in Python and deployed via Streamlit, it allows users to accurately project portfolio survival probabilities using advanced statistical frameworks, including fat-tailed distributions and dynamic behavioral guardrails. This project involves the use of stochastic lifespans and copulas between market returns and inflation rates, which provides a step up on free prediction models.""")
 st.divider()
-st.markdown("""**How To Use:** 
+st.markdown("""**How To Use:**  
 Input your specific personal, market, and macroeconomic assumptions including dynamic income streams, behavioral guardrails, and effective tax rates. Click the \"Run Simulation\" button to run thousands of simulated lifecycles. Review your portfolio's performance metrics to gauge success rate, median real-dollar balance, and worst-case scenario outcomes.""")
 
 # User Inputs (Sidebar)
@@ -214,6 +214,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
