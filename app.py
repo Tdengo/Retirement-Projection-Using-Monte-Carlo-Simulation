@@ -177,7 +177,7 @@ if st.button("Run Simulation", type="primary"):
             balance_at_death = path[years_survived]
             ending_balances.append(balance_at_death)
             
-            if current_balance > 0:
+            if balance_at_death > 0:
                 successful_lifetimes += 1
 
         # Calculation Metrics
@@ -247,6 +247,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
