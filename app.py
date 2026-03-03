@@ -175,7 +175,7 @@ if st.button("Run Simulation", type="primary"):
             years_survived = random_lifespans[i]
 
             balance_at_death = path[years_survived]
-            ending_balance.append(balance_at_death)
+            ending_balances.append(balance_at_death)
             
             if current_balance > 0:
                 successful_lifetimes += 1
@@ -247,6 +247,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
