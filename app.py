@@ -11,6 +11,8 @@ Traditional retirement calculators rely on static, normally distributed returns,
 st.divider()
 st.markdown("""**How To Use:**  
 Input your specific personal, market, and macroeconomic assumptions including dynamic income streams, behavioral guardrails, and effective tax rates. Click the \"Run Simulation\" button to run thousands of simulated lifecycles. Review your portfolio's performance metrics to gauge success rate, median real-dollar balance, and worst-case scenario outcomes.""")
+st.divider()
+st.caption("""**Disclaimer:** This tool is for educational and informational purposes only and does not constitute financial advice. The Monte Carlo simulations rely on historical approximations and mathematical assumptions (such as the Gompertz law of mortality and Gaussian copulas) that cannot guarantee future real-world outcomes. Always consult a certified financial planner before making retirement decisions.""")
 
 # User Inputs (Sidebar)
 st.sidebar.header("Personal Assumptions")
@@ -247,6 +249,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
