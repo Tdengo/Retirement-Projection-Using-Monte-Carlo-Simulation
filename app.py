@@ -99,7 +99,7 @@ if st.button("Run Simulation", type="primary"):
 
         # 4. Stochastic Markov Process for Gompertz Mortality
         if use_stochastic_lifespan:
-            ages = current_age + np.arrange(years_in_retirement)
+            ages = current_age + np.arange(years_in_retirement)
             mortality_rates = np.clip(0.015 * np.exp(0.095 * (ages - 65)), 0.0, 1.0)
 
             death_rolls = np.random.rand(num_simulations, years_in_retirement)
@@ -247,6 +247,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
