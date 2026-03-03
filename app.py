@@ -17,6 +17,9 @@ st.sidebar.header("Personal Assumptions")
 starting_balance = st.sidebar.number_input("Starting Balance ($)", value=1000000, step=50000)
 initial_withdrawal = st.sidebar.number_input("Annual Withdrawal ($)", value=40000, step=5000)
 years_in_retirement = st.sidebar.slider("Years in Retirement", min_value=10, max_value=50, value=30)
+st.sidebar.header("Actuarial Mortality")
+use_stochastic_lifespan = st.sidebar.checkbox("Enable Stochastic Lifespans (Markov)", value=False, help="Uses the Gompertz mortality curve to simulate year-by-year survival probabilities.")
+current_age = st.sidebar.number_input("Retirement Age", value=65, step=1, max_value=100)
 
 st.sidebar.header("Additional Income Streams")
 num_income_streams = st.sidebar.selectbox("Number of Income Streams", [0, 1, 2, 3, 4], index=0)
@@ -93,7 +96,23 @@ if st.button("Run Simulation", type="primary"):
         actual_arithmetic_mean = np.mean(copula_returns)
         target_average_mean = np.mean(mean_path)
 
-        # 4. The Monte Carlo Loop
+        # 4. Stochastic Markov Process for Gompertz Mortality
+        if use_stochastic_lifespan:
+            ages = current_age + np.arrange(years_in_retirement)
+            mortality_rates = np.clip(0.015 * np.exp(0.095 * (ages - 65)), 0.0, 1.0)
+
+            death_rolls = np.random.rand(num_simulations, years_in_retirement)
+
+            died_this_year_matrix = np.hstack([
+                death_rolls < mortality_rates, np.ones((num_simulations, 1), dtype = bool)
+            ])
+
+            random_lifespans = np.argmax(died_this_year_matrix, axis = 1)
+            random_lifespans = np.maximum(random_lifespans, 1)
+        else:
+            random_lifespans = np.full(num_simulations, years_in_retirement)
+        
+        # 5. The Monte Carlo Loop
         successful_lifetimes = 0
         ending_balances = []
         all_paths = []
@@ -152,7 +171,10 @@ if st.button("Run Simulation", type="primary"):
                 path.append(current_balance)
 
             all_paths.append(path)
-            ending_balances.append(current_balance)
+            years_survived = random_lifespans[i]
+
+            balance_at_death = path[years_survived]
+            ending_balance.append(balance_at_death)
             
             if current_balance > 0:
                 successful_lifetimes += 1
@@ -224,5 +246,6 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
