@@ -17,6 +17,7 @@ st.sidebar.header("Personal Assumptions")
 starting_balance = st.sidebar.number_input("Starting Balance ($)", value=1000000, step=50000)
 initial_withdrawal = st.sidebar.number_input("Annual Withdrawal ($)", value=40000, step=5000)
 years_in_retirement = st.sidebar.slider("Years in Retirement", min_value=10, max_value=50, value=30)
+
 st.sidebar.header("Actuarial Mortality")
 use_stochastic_lifespan = st.sidebar.checkbox("Enable Stochastic Lifespans (Markov)", value=False, help="Uses the Gompertz mortality curve to simulate year-by-year survival probabilities.")
 current_age = st.sidebar.number_input("Retirement Age", value=65, step=1, max_value=100)
@@ -246,6 +247,7 @@ if st.button("Run Simulation", type="primary"):
             
             ax_hist.legend()
             st.pyplot(fig_hist)
+
 
 
 
