@@ -8,3 +8,4 @@ https://retirement-projection-using-monte-carlo-simulation-tgmbdx2xnin.streamlit
 -  **Dynamic Spending Guardrails:** Implements programmable withdrawal rules (e.g., Guyton-Klinger) that automatically reduce spending during market stress while maintaining a hard, inflation-adjusted survival floor.
 -  **Real-Dollar Purchasing Power:** Utilizes the Fisher Equation to automatically convert all simulation outcomes from nominal dollars into real purchasing power for accurate lifestyle planning.
 -  **High-Performance Vectorization:** Pre-computes 1.5 million correlated random variables using NumPy array broadcasting, reducing simulation time for 50,000 lifetimes.
+-  **Stochastic Lifespan:** Replaces static retirement horizons with dynamic actuarial modeling, utilizing a vectorized Markov Chain and the Gompertz curve to calculate realistic year-by-year mortality probabilities.
